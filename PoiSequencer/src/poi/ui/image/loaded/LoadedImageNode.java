@@ -2,11 +2,13 @@ package poi.ui.image.loaded;
 
 import java.awt.image.BufferedImage;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.ImageView;
 import poi.ui.image.ImageData;
+import poi.ui.image.utility.ImageUtilities;
 
 public class LoadedImageNode {
+	
+	private static final int SCALE_FACTOR = 4;
 	
 	private ImageData imageData;
 	private ImageView imageView;
@@ -15,9 +17,12 @@ public class LoadedImageNode {
 		this.imageData = imageData;
 		
 		BufferedImage img = imageData.getImage();
-		imageView = new ImageView(SwingFXUtils.toFXImage(img, null));
-		imageView.setFitHeight(64);
-		imageView.setFitWidth(64 * (img.getWidth() / (double) img.getHeight()));
+		imageView = new ImageView(ImageUtilities.resample(img, SCALE_FACTOR));
+	}
+	
+	public void refresh() {
+		BufferedImage img = imageData.getImage();
+		imageView.setImage(ImageUtilities.resample(img, SCALE_FACTOR));
 	}
 	
 	public ImageView getNode() {

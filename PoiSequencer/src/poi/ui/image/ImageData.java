@@ -17,6 +17,10 @@ public class ImageData {
 		this.filePath = filePath;
 	}
 	
+	public void setImage(BufferedImage image) {
+		this.image = image;
+	}
+	
 	public void setFilePath(URL filePath) {
 		this.filePath = filePath;
 	}

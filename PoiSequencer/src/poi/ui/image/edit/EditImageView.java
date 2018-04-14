@@ -17,6 +17,7 @@ public class EditImageView {
 	
 	private BorderPane borderPane;
 	private ImageData image;
+	private DrawImageView drawImageView;
 	
 	private boolean submitted = false;
 	
@@ -33,7 +34,8 @@ public class EditImageView {
 		colourSelector.getNode().setMaxSize(30, 30);
 		borderPane.setRight(colourSelector.getNode());
 		
-		borderPane.setCenter(new ScrollPane(new DrawImageView(image, colourSelector).getNode()));
+		drawImageView = new DrawImageView(image, colourSelector);
+		borderPane.setCenter(new ScrollPane(drawImageView.getNode()));
 		
 
 		Button doneButton = new Button("\u2714");
@@ -51,6 +53,9 @@ public class EditImageView {
 	
 	private void close(boolean isSubmitted) {
 		this.submitted = isSubmitted;
+		if (isSubmitted) {
+			image.setImage(drawImageView.getImage());
+		}
 		borderPane.getScene().getWindow().hide();
 	}
 	
