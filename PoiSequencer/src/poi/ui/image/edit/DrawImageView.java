@@ -69,17 +69,18 @@ public class DrawImageView {
 				int red = (rgb >> 16) & 0xFF;
 				int green = (rgb >> 8) & 0xFF;
 				int blue = rgb & 0xFF;
-				ColouredPane pane = new ColouredPane(new Colour(red, green, blue));
-				gridPane.add(new VBox(pane.getNode(), new Pane()), x, y);
+				ColouredPane colouredPane = new ColouredPane(new Colour(red, green, blue));
+				Pane pane = colouredPane.getNode();
+				gridPane.add(new VBox(pane, new Pane()), x, y);
 				
-				IndexedPane indexedPane = new IndexedPane(pane, x, y);
+				IndexedPane indexedPane = new IndexedPane(colouredPane, x, y);
 
-				pane.getNode().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> singlePixelChange(indexedPane));
-				pane.getNode().addEventHandler(MouseDragEvent.DRAG_DETECTED, event -> startPaint(indexedPane));
-				pane.getNode().addEventHandler(MouseDragEvent.MOUSE_DRAG_ENTERED, event -> changePixelColour(indexedPane));
-				pane.getNode().addEventHandler(MouseDragEvent.MOUSE_DRAG_RELEASED, event -> endPaint());
+				pane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> singlePixelChange(indexedPane));
+				pane.addEventHandler(MouseDragEvent.DRAG_DETECTED, event -> startPaint(indexedPane));
+				pane.addEventHandler(MouseDragEvent.MOUSE_DRAG_ENTERED, event -> changePixelColour(indexedPane));
+				pane.addEventHandler(MouseDragEvent.MOUSE_DRAG_RELEASED, event -> endPaint());
 				
-				pixels.put(new Pair<>(x, y), pane);
+				pixels.put(new Pair<>(x, y), colouredPane);
 			}
 		}
 		
@@ -100,7 +101,7 @@ public class DrawImageView {
 	}
 	
 	private void undo(KeyEvent event) {
-		if (KeyCode.Z.equals(event.getCode()) && event.isControlDown()) {
+		if (KeyCode.Z.equals(event.getCode()) && event.isControlDown() && currentFrame == null) {
 			UndoFrame frame = undoStack.undo();
 			if (frame == null) {
 				return;
@@ -115,7 +116,7 @@ public class DrawImageView {
 	}
 	
 	private void redo(KeyEvent event) {
-		if (KeyCode.Y.equals(event.getCode()) && event.isControlDown()) {
+		if (KeyCode.Y.equals(event.getCode()) && event.isControlDown() && currentFrame == null) {
 			UndoFrame frame = undoStack.redo();
 			if (frame == null) {
 				return;
