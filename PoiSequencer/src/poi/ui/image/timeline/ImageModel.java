@@ -25,8 +25,10 @@ public class ImageModel implements Observable {
 	}
 
 	public void setDuration(double duration) {
-		this.duration = duration;
-		observerManager.notifyObservers(DURATION_CHANGED, duration);
+		if (duration != this.duration) {
+			this.duration = duration;
+			observerManager.notifyObservers(DURATION_CHANGED, duration);
+		}
 	}
 	
 	public ImageData getImageData() {

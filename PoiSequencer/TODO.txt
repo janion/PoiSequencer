@@ -1,7 +1,6 @@
 TODO:
 
 - Export timeline
-- Right click on timeline image to change duration
 - Add time scale to timeline
 - Save project to open later without exporting
 
@@ -14,3 +13,4 @@ DONE:
 + Compress loaded images in both size and colour palette
 + Right click on loaded image to add to timeline (Via model)
 + Right click on timeline image to remove
++ Right click on timeline image to change duration

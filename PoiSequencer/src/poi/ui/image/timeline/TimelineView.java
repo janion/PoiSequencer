@@ -32,7 +32,9 @@ public class TimelineView {
 	private void addImage(ImageModel imageModel, int index) {
 		TimelineImageNode img = new TimelineImageNode(imageModel, model);
 		
-		img.setWidth(zoomLevel * img.getPrefWidth());
+		imageModel.getObserverManager().addObserver(ImageModel.DURATION_CHANGED, duration -> img.setWidth(zoomLevel * duration));
+		
+		img.setWidth(zoomLevel * img.getDuration());
 		hbox.getChildren().add(img.getNode());
 		imageNodeMap.put(imageModel, img);
 		
