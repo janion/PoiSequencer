@@ -3,14 +3,13 @@ package exploratory;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import poi.ui.image.edit.EditImageView;
+import poi.ui.HomeView;
 
 public class Launcher extends Application {
-
+	
 	@Override
 	public void start(Stage stage) throws Exception {
-//		Scene scene = new Scene(new ColourSelector().getNode());
-		Scene scene = new Scene(new EditImageView().getNode());
+		Scene scene = new Scene(new HomeView().getNode());
 
 		stage.setScene(scene);
 		stage.setWidth(200);

@@ -1,12 +1,16 @@
 package poi.ui;
 
 import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import javafx.geometry.Orientation;
 import javafx.scene.control.SplitPane;
-import javafx.scene.image.Image;
+import poi.ui.image.ImageData;
 import poi.ui.image.loaded.LoadedImageView;
-import poi.ui.image.timeline.AdjustableImageNode;
+import poi.ui.image.timeline.ImageModel;
+import poi.ui.image.timeline.TimelineModel;
 import poi.ui.image.timeline.TimelineView;
 
 public class HomeView {
@@ -15,27 +19,20 @@ public class HomeView {
 	private TimelineView timeline;
 	
 	public HomeView() {
-		timeline = new TimelineView();
+		TimelineModel model = new TimelineModel();
+		timeline = new TimelineView(model);
 		
-		splitPane = new SplitPane(new LoadedImageView().getNode(), timeline.getNode());
+		splitPane = new SplitPane(new LoadedImageView(model).getNode(), timeline.getNode());
 		splitPane.setOrientation(Orientation.VERTICAL);
 //		splitPane.setDividerPosition(0, 1.0);
 		
 		
 		// TODO remove
-		AdjustableImageNode img1 = null;
-		AdjustableImageNode img2 = null;
 		try {
-			img1 = new AdjustableImageNode(new Image(new File("src/exploratory/mini5.bmp").toURI().toURL().openStream()), 50);
-			img2 = new AdjustableImageNode(new Image(new File("src/exploratory/mini7.bmp").toURI().toURL().openStream()), 250);
-		} catch (Exception e) {
+			model.addImage(new ImageModel(50.0, new ImageData(ImageIO.read(new File("src/exploratory/mini5.bmp")))));
+			model.addImage(new ImageModel(250.0, new ImageData(ImageIO.read(new File("src/exploratory/mini7.bmp")))));
+		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		if (img1 != null) {
-			timeline.addImage(img1);
-		}
-		if (img2 != null) {
-			timeline.addImage(img2);
 		}
 	}
 	
