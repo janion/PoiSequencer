@@ -1,11 +1,8 @@
 TODO:
 
-- Right click on loaded image to add to timeline (Via model)
 - Export timeline
-- Right click on timeline image to change duration or remove
+- Right click on timeline image to change duration
 - Add time scale to timeline
-- Load in images
-- Compress loaded images in both size and colour palette
 - Save project to open later without exporting
 
 DONE:
@@ -13,3 +10,7 @@ DONE:
 + Right click on loaded image to save
 + Add image to Loaded view on tick from new image dialog
 + Double click on loaded image to edit
++ Load in images
++ Compress loaded images in both size and colour palette
++ Right click on loaded image to add to timeline (Via model)
++ Right click on timeline image to remove

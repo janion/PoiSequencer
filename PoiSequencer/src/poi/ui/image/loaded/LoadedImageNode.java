@@ -20,8 +20,9 @@ import poi.ui.image.ImageData;
 import poi.utility.ImageUtilities;
 
 public class LoadedImageNode implements Observable {
-	
-	public static final ObserverType<ImageData> ADD_TO_TIMELINE = new ObserverType<>();
+
+	public static final ObserverType<Void> ADD_TO_TIMELINE = new ObserverType<>();
+	public static final ObserverType<Void> REMOVE = new ObserverType<>();
 	
 	private static final int SCALE_FACTOR = 4;
 	
@@ -50,6 +51,7 @@ public class LoadedImageNode implements Observable {
 			contextMenu = new ContextMenu();
 			contextMenu.getItems().add(createSaveItem());
 			contextMenu.getItems().add(createAddToTimelineItem());
+			contextMenu.getItems().add(createRemoveItem());
 			
 			contextMenu.setOnHidden(hideEvent -> contextMenu = null);
 			contextMenu.show(imageView, event.getScreenX(), event.getScreenY());
@@ -76,7 +78,14 @@ public class LoadedImageNode implements Observable {
 	
 	private MenuItem createAddToTimelineItem() {
 		MenuItem timelineItem = new MenuItem("Add to timeline");
-		timelineItem.setOnAction(event -> observerManager.notifyObservers(ADD_TO_TIMELINE, imageData));
+		timelineItem.setOnAction(event -> observerManager.notifyObservers(ADD_TO_TIMELINE, null));
+		
+		return timelineItem;
+	}
+	
+	private MenuItem createRemoveItem() {
+		MenuItem timelineItem = new MenuItem("Remove");
+		timelineItem.setOnAction(event -> observerManager.notifyObservers(REMOVE, null));
 		
 		return timelineItem;
 	}

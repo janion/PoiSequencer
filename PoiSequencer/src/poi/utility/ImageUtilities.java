@@ -1,7 +1,10 @@
 package poi.utility;
 
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -49,11 +52,32 @@ public class ImageUtilities {
         // creates output image
         BufferedImage outputImage = new BufferedImage(width,
         		height, inputImage.getType());
- 
-        // scales the input image to the output image
-        Graphics2D g2d = outputImage.createGraphics();
-        g2d.drawImage(inputImage, 0, 0, width, height, null);
-        g2d.dispose();
+
+        int compressionFactorX = inputImage.getWidth() / (width);
+        int compressionFactorY = inputImage.getHeight() / (height);
+
+        for (int x = 0; x < width; x++) {
+        	for (int y = 0; y < height; y++) {
+            	int originX = x * compressionFactorX;
+            	int originY = y * compressionFactorY;
+
+            	int r = 0;
+            	int g = 0;
+            	int b = 0;
+
+                for (int i = 0; i < compressionFactorX; i++) {
+                	for (int j = 0; j < compressionFactorY; j++) {
+            			int rgb = inputImage.getRGB(originX + i, originY + j);
+                		r += (rgb >> 16) & 0xff;
+                		g += (rgb >> 8) & 0xff;
+                		b += rgb & 0xff;
+                	}
+                }
+                int totalPixels = compressionFactorX * compressionFactorY;
+                int newRgb = (b / totalPixels) + ((g / totalPixels) << 8) + ((r / totalPixels) << 16);
+                outputImage.setRGB(x, y, newRgb);
+            }
+        }
  
         return outputImage;
 	}
@@ -76,6 +100,10 @@ public class ImageUtilities {
         }
  
         return outputImage;
+	}
+	
+	public static BufferedImage compressImageTo6BitColourPalette(BufferedImage inputImage, int height) {
+		return convertImageTo6BitColourPalette(compressImage(inputImage, height));
 	}
 	
 	private static int round(double value) {

@@ -1,11 +1,8 @@
 package poi.ui.image.timeline;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 
@@ -14,9 +11,8 @@ public class TimelineView {
 	private TimelineModel model;
 
 	private double zoomLevel = 1;
-	private List<AdjustableImageNode> imageNodes = new ArrayList<>();
 	
-	private Map<ImageModel, AdjustableImageNode> imageNodeMap = new HashMap<>();
+	private Map<ImageModel, TimelineImageNode> imageNodeMap = new HashMap<>();
 	
 	private HBox hbox;
 	private ScrollPane scrollPane;
@@ -34,25 +30,24 @@ public class TimelineView {
 	}
 	
 	private void addImage(ImageModel imageModel, int index) {
-		AdjustableImageNode img = new AdjustableImageNode(
-				SwingFXUtils.toFXImage(imageModel.getImageData().getImage(), null), imageModel.getDuration());
-
+		TimelineImageNode img = new TimelineImageNode(imageModel, model);
+		
 		img.setWidth(zoomLevel * img.getPrefWidth());
-		imageNodes.add(img);
 		hbox.getChildren().add(img.getNode());
+		imageNodeMap.put(imageModel, img);
+		
 	}
 	
 	public void removeImage(ImageModel imageModel) {
 		AdjustableImageNode img = imageNodeMap.remove(imageModel);
 		if (img != null) {
-			imageNodes.remove(img);
 			hbox.getChildren().remove(img.getNode());
 		}
 	}
 
 	public void setZoomLevel(double zoomLevel) {
 		this.zoomLevel = zoomLevel;
-		for (AdjustableImageNode img : imageNodes) {
+		for (TimelineImageNode img : imageNodeMap.values()) {
 			img.setWidth(zoomLevel * img.getPrefWidth());
 		}
 	}

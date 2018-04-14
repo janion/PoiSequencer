@@ -1,5 +1,11 @@
 package poi.ui.image.loaded;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -10,12 +16,15 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import poi.ui.image.ImageData;
 import poi.ui.image.edit.EditImageView;
 import poi.ui.image.timeline.ImageModel;
 import poi.ui.image.timeline.TimelineModel;
+import poi.utility.ImageUtilities;
 
 public class LoadedImageView {
 	
@@ -35,9 +44,33 @@ public class LoadedImageView {
 		scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 
 		borderPane = new BorderPane(scrollPane);
+		
 		Button newButton = new Button("New");
 		newButton.setOnAction(event -> openEditView(null, null));
-		borderPane.setTop(new HBox(newButton, new Button("Load")));
+		
+		Button loadButton = new Button("Load");
+		loadButton.setOnAction(event -> loadImage());
+		
+		borderPane.setTop(new HBox(newButton,loadButton));
+	}
+	
+	private void loadImage() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("Bitmap Files", "*.bmp"));
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("JPEG Files", "*.jpg"));
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG Files", "*.png"));
+		File file = fileChooser.showOpenDialog(borderPane.getScene().getWindow());
+		
+		if (file != null) {
+			try {
+				BufferedImage img = ImageUtilities.compressImageTo6BitColourPalette(ImageIO.read(file), 16);
+				ImageData imageData = new ImageData(img, file.toURI().toURL());
+				LoadedImageNode loadedImage = createLoadedImageNode(imageData);
+				flowPane.getChildren().add(loadedImage.getNode());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	private void openEditView(ImageData imageData, LoadedImageNode loadedImageNode) {
@@ -50,7 +83,7 @@ public class LoadedImageView {
 		
 		if (editImageView.isSubmitted()) {
 			if (loadedImageNode == null) {
-				LoadedImageNode loadedImage = createLoadedImageNode(editImageView);
+				LoadedImageNode loadedImage = createLoadedImageNode(editImageView.getImageData());
 				flowPane.getChildren().add(loadedImage.getNode());
 			} else {
 				loadedImageNode.refresh();
@@ -58,18 +91,21 @@ public class LoadedImageView {
 		}
 	}
 	
-	private LoadedImageNode createLoadedImageNode(EditImageView editImageView) {
-		LoadedImageNode loadedImage = new LoadedImageNode(editImageView.getImageData());
+	private LoadedImageNode createLoadedImageNode(ImageData imageData) {
+		LoadedImageNode loadedImage = new LoadedImageNode(imageData);
 		ImageView node = loadedImage.getNode();
 		
 		node.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
 			if (event.getClickCount() == 2 && MouseButton.PRIMARY.equals(event.getButton())) {
-				openEditView(editImageView.getImageData(), loadedImage);
+				openEditView(imageData, loadedImage);
 			}
 		});
 
 		loadedImage.getObserverManager().addObserver(LoadedImageNode.ADD_TO_TIMELINE,
-				imageData -> model.addImage(new ImageModel(10.0, imageData)));
+				nullValue -> model.addImage(new ImageModel(10.0, imageData)));
+
+		loadedImage.getObserverManager().addObserver(LoadedImageNode.REMOVE,
+				nullValue -> flowPane.getChildren().remove(node));
 		
 		return loadedImage;
 	}
