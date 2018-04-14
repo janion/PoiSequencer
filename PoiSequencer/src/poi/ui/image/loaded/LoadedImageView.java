@@ -1,11 +1,9 @@
-package poi.ui;
+package poi.ui.image.loaded;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -20,6 +18,8 @@ public class LoadedImageView {
 	
 	public LoadedImageView() {
 		flowPane = new FlowPane();
+		flowPane.setVgap(4);
+		flowPane.setHgap(4);
 		
 		ScrollPane scrollPane = new ScrollPane(flowPane);
 		scrollPane.setFitToWidth(true);
@@ -37,15 +37,10 @@ public class LoadedImageView {
 			stage.showAndWait();
 			
 			if (editImageView.isSubmitted()) {
-				flowPane.getChildren().add(new ImageView(SwingFXUtils.toFXImage(editImageView.getImage(), null)));
+				flowPane.getChildren().add(new LoadedImageNode(editImageView.getImageData()).getNode());
 			}
 		});
 		borderPane.setTop(new HBox(newButton, new Button("Load")));
-		
-		// TODO remove
-		for (int i = 0; i < 40; i++) {
-			flowPane.getChildren().add(new Button(String.valueOf(i)));
-		}
 	}
 	
 	public BorderPane getNode() {

@@ -8,6 +8,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import poi.ui.image.ImageData;
 import poi.ui.image.edit.colour.ColourSelector;
 
 public class EditImageView {
@@ -15,15 +16,15 @@ public class EditImageView {
 	private static final int IMAGE_SIZE = 16;
 	
 	private BorderPane borderPane;
-	private BufferedImage image;
+	private ImageData image;
 	
 	private boolean submitted = false;
 	
 	public EditImageView() {
-		this(new BufferedImage(IMAGE_SIZE, IMAGE_SIZE, BufferedImage.TYPE_INT_RGB));
+		this(new ImageData(new BufferedImage(IMAGE_SIZE, IMAGE_SIZE, BufferedImage.TYPE_INT_RGB)));
 	}
 	
-	public EditImageView(BufferedImage image) {
+	public EditImageView(ImageData image) {
 		this.image = image;
 		
 		borderPane = new BorderPane();
@@ -61,7 +62,7 @@ public class EditImageView {
 		return submitted;
 	}
 	
-	public BufferedImage getImage() {
+	public ImageData getImageData() {
 		return image;
 	}
 

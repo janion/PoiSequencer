@@ -13,6 +13,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
+import poi.ui.image.ImageData;
 import poi.ui.image.edit.colour.Colour;
 import poi.ui.image.edit.colour.ColourSelector;
 import poi.ui.image.edit.colour.ColouredPane;
@@ -55,8 +56,8 @@ public class DrawImageView {
 	private UndoFrame currentFrame;
 	private Map<Pair<Integer, Integer>, ColouredPane> pixels;
 	
-	public DrawImageView(BufferedImage image, ColourSelector colourSelector) {
-		this.image = image;
+	public DrawImageView(ImageData imageData, ColourSelector colourSelector) {
+		this.image = imageData.getImage();
 		this.colourSelector = colourSelector;
 		undoStack = new UndoStack();
 		

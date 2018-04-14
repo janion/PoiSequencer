@@ -5,6 +5,7 @@ import java.io.File;
 import javafx.geometry.Orientation;
 import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
+import poi.ui.image.loaded.LoadedImageView;
 import poi.ui.image.timeline.AdjustableImageNode;
 import poi.ui.image.timeline.TimelineView;
 
