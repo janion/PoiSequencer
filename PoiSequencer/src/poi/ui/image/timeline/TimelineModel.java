@@ -2,6 +2,7 @@ package poi.ui.image.timeline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import poi.observable.Observable;
 import poi.observable.ObserverManager;
@@ -40,6 +41,10 @@ public class TimelineModel implements Observable {
 	@Override
 	public ObserverManager getObserverManager() {
 		return observerManager;
+	}
+	
+	public double getTotalDuration() {
+		return images.stream().collect(Collectors.summingDouble(ImageModel::getDuration));
 	}
 
 }

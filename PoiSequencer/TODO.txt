@@ -1,7 +1,8 @@
 TODO:
 
+- Convert LoadedImageView to use a LoadedImageModel
 - Export timeline
-- Add time scale to timeline
+- Time scale on timeline should be numbered
 - Save project to open later without exporting
 
 DONE:
@@ -14,3 +15,4 @@ DONE:
 + Right click on loaded image to add to timeline (Via model)
 + Right click on timeline image to remove
 + Right click on timeline image to change duration
++ Add time scale to timeline

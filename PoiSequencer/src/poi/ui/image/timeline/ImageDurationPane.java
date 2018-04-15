@@ -1,7 +1,5 @@
 package poi.ui.image.timeline;
 
-import java.util.OptionalDouble;
-
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

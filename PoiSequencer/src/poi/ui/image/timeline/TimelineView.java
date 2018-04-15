@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import poi.ui.image.timeline.scale.TimeScaleRuler;
 
 public class TimelineView {
 	
@@ -20,8 +23,15 @@ public class TimelineView {
 	public TimelineView(TimelineModel model) {
 		this.model = model;
 		hbox = new HBox();
-		scrollPane = new ScrollPane(hbox);
+		zoomLevel = 10;
+//		scrollPane = new ScrollPane(hbox);
+		BorderPane borderPane = new BorderPane(hbox);
+		TimeScaleRuler ruler = new TimeScaleRuler(model, 1);
+		borderPane.setBottom(ruler.getNode());
+		
+		scrollPane = new ScrollPane(borderPane);
 		scrollPane.setFitToHeight(true);
+//		scrollPane.minHeightProperty().bind(hbox.minHeightProperty().add(ruler.getNode().minHeightProperty()));
 
 		model.getObserverManager().addObserver(TimelineModel.IMAGE_ADDED,
 				dataAndIndex -> addImage(dataAndIndex.getFirst(), dataAndIndex.getSecond()));
