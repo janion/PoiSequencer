@@ -1,6 +1,7 @@
 package poi.ui.image.timeline.scale;
 
 import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -13,13 +14,13 @@ public class TimeScaleRuler {
 	private Observer<Double> durationChangeObserver;
 	
 	private TimelineModel timelineModel;
-	private int scale;
+	private double tickIncrement;
 	
 	private HBox hbox;
 
-	public TimeScaleRuler(TimelineModel timelineModel, int scale) {
+	public TimeScaleRuler(TimelineModel timelineModel, double scale) {
 		this.timelineModel = timelineModel;
-		this.scale = scale;
+		this.tickIncrement = scale;
 		
 		hbox = new HBox();
 		hbox.setAlignment(Pos.BOTTOM_CENTER);
@@ -46,22 +47,26 @@ public class TimeScaleRuler {
 		hbox.getChildren().clear();
 		
 		hbox.getChildren().addAll(createLine(0));
-		int t = scale;
+		double t = tickIncrement;
 		while(t <= timelineModel.getTotalDuration()) {
 			hbox.getChildren().addAll(createSpacer(), createLine(t));
-			t += scale;
+			t += tickIncrement;
 		}
 	}
 	
-	private Pane createLine(int time) {
+	private Pane createLine(double time) {
 		Pane pane = new Pane();
 		pane.setPrefWidth(2);
 		HBox.setHgrow(pane, Priority.NEVER);
 		pane.setStyle("-fx-border-color: BLACK");
 		
-		if (time % (5 * scale) != 0) {
-			pane.minHeightProperty().bind(hbox.heightProperty().divide(2));
-			pane.maxHeightProperty().bind(hbox.heightProperty().divide(2));
+		if (time % (5 * tickIncrement) != 0) {
+			pane.minHeightProperty().bind(hbox.heightProperty().divide(4));
+			pane.maxHeightProperty().bind(hbox.heightProperty().divide(4));
+		} else {
+			Label label = new Label(String.format("%.1f", time));
+			label.setTranslateX(3);
+			pane.getChildren().add(label);
 		}
 		return pane;
 	}
@@ -72,8 +77,8 @@ public class TimeScaleRuler {
 		return pane;
 	}
 	
-	public void setScale(int scale) {
-		this.scale = scale;
+	public void setTickIncrement(double tickIncrement) {
+		this.tickIncrement = tickIncrement;
 		refresh();
 	}
 	
