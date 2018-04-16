@@ -3,6 +3,8 @@ package poi.ui.image.loaded;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -20,20 +22,35 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import poi.observable.Observable;
+import poi.observable.ObserverManager;
+import poi.observable.ObserverManagerImpl;
+import poi.observable.ObserverType;
 import poi.ui.image.ImageData;
 import poi.ui.image.edit.EditImageView;
 import poi.ui.image.timeline.ImageModel;
 import poi.ui.image.timeline.TimelineModel;
 import poi.utility.ImageUtilities;
 
-public class LoadedImageView {
+public class LoadedImageView implements Observable {
 	
-	private TimelineModel model;
+	public static final ObserverType<ImageData> REQUEST_ADD_TO_TIMELINE = new ObserverType<>();
+	
+	private LoadedImageModel imageModel;
 	private BorderPane borderPane;
 	private FlowPane flowPane;
 	
-	public LoadedImageView(TimelineModel model) {
-		this.model = model;
+	private Map<ImageData, LoadedImageNode> imageNodes;
+	
+	private ObserverManager observerManager = new ObserverManagerImpl();
+	
+	public LoadedImageView() {
+		imageNodes = new HashMap<>();
+		
+		imageModel = new LoadedImageModel();
+		imageModel.getObserverManager().addObserver(LoadedImageModel.IMAGE_ADDED, this::addImage);
+		imageModel.getObserverManager().addObserver(LoadedImageModel.IMAGE_REMOVED, this::removeImage);
+		
 		flowPane = new FlowPane();
 		flowPane.setVgap(4);
 		flowPane.setHgap(4);
@@ -83,11 +100,23 @@ public class LoadedImageView {
 		
 		if (editImageView.isSubmitted()) {
 			if (loadedImageNode == null) {
-				LoadedImageNode loadedImage = createLoadedImageNode(editImageView.getImageData());
-				flowPane.getChildren().add(loadedImage.getNode());
+				imageModel.addImage(editImageView.getImageData());
 			} else {
 				loadedImageNode.refresh();
 			}
+		}
+	}
+	
+	private void addImage(ImageData image) {
+		LoadedImageNode loadedImage = createLoadedImageNode(image);
+		flowPane.getChildren().add(loadedImage.getNode());
+		imageNodes.put(image, loadedImage);
+	}
+	
+	private void removeImage(ImageData image) {
+		LoadedImageNode loadedImage = imageNodes.remove(image);
+		if (image != null) {
+			flowPane.getChildren().remove(loadedImage.getNode());
 		}
 	}
 	
@@ -102,16 +131,21 @@ public class LoadedImageView {
 		});
 
 		loadedImage.getObserverManager().addObserver(LoadedImageNode.ADD_TO_TIMELINE,
-				nullValue -> model.addImage(new ImageModel(10.0, imageData)));
+				nullValue -> observerManager.notifyObservers(REQUEST_ADD_TO_TIMELINE, imageData));
 
 		loadedImage.getObserverManager().addObserver(LoadedImageNode.REMOVE,
-				nullValue -> flowPane.getChildren().remove(node));
+				nullValue -> imageModel.removeImage(imageData));
 		
 		return loadedImage;
 	}
 	
 	public BorderPane getNode() {
 		return borderPane;
+	}
+
+	@Override
+	public ObserverManager getObserverManager() {
+		return observerManager;
 	}
 
 }

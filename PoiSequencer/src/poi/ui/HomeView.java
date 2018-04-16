@@ -22,18 +22,12 @@ public class HomeView {
 		TimelineModel model = new TimelineModel();
 		timeline = new TimelineView(model);
 		
-		splitPane = new SplitPane(new LoadedImageView(model).getNode(), timeline.getNode());
+		LoadedImageView loadedImageView = new LoadedImageView();
+		loadedImageView.getObserverManager().addObserver(LoadedImageView.REQUEST_ADD_TO_TIMELINE,
+				imageData -> model.addImage(new ImageModel(10.0, imageData)));
+		splitPane = new SplitPane(loadedImageView.getNode(), timeline.getNode());
 		splitPane.setOrientation(Orientation.VERTICAL);
 //		splitPane.setDividerPosition(0, 1.0);
-		
-		
-		// TODO remove
-		try {
-			model.addImage(new ImageModel(50.0, new ImageData(ImageIO.read(new File("src/exploratory/mini5.bmp")))));
-			model.addImage(new ImageModel(250.0, new ImageData(ImageIO.read(new File("src/exploratory/mini7.bmp")))));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	public SplitPane getNode() {

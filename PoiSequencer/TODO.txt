@@ -1,6 +1,5 @@
 TODO:
 
-- Convert LoadedImageView to use a LoadedImageModel
 - Save project to open later without exporting
 - Export timeline
 - Drag and drop images around the timeline
@@ -21,3 +20,4 @@ DONE:
 + Time scale on timeline should be numbered
 + Timeline set ticks to "logical" values eg. 0.5, 1, 2, 5, 10, 20, 50, 100, etc.
 + Min and max zoom levels
++ Convert LoadedImageView to use a LoadedImageModel
