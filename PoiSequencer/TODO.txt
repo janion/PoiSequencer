@@ -2,7 +2,7 @@ TODO:
 
 - Make better image duration dialog
 - Save project to open later without exporting
-- Export timeline
+- Add export timeline button (single or multiple files? Will need different arduino codes to cope)
 - Drag and drop images around the timeline
   - Or at least swap with adjacent images
 

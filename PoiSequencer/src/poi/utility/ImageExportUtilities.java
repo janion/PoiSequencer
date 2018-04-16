@@ -1,21 +1,51 @@
 package poi.utility;
 
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+
+import poi.ui.image.timeline.ImageModel;
+import poi.ui.image.timeline.TimelineModel;
 
 public class ImageExportUtilities {
 	
 	private ImageExportUtilities() {
 		// Do nothing
 	}
-	
-	public static void ExportImageIn6Bit(BufferedImage input, File exportFile, double duration) throws IOException {
-		BufferedImage toExport = ImageUtilities.convertImageTo6BitColourPalette(input);
-		
+
+	public static void ExportImageIn6Bit(TimelineModel timelineModel, File exportFile)
+			throws IOException, URISyntaxException {
+		boolean firstFile = true;
+		for (ImageModel imageModel : timelineModel.getImages()) {
+			BufferedImage toExport = ImageUtilities.convertImageTo6BitColourPalette(imageModel.getImageData().getImage());
+			byte[] byteArray = createByteArray(toExport, imageModel.getDuration(), exportFile);
+			
+			if (firstFile) {
+				Files.write(exportFile.toPath(), byteArray);
+			} else {
+				Files.write(exportFile.toPath(), byteArray, APPEND, CREATE);
+			}
+			Files.write(exportFile.toPath(), new byte[] {'E', 'N', 'D'}, APPEND, CREATE);
+		}
+	}
+
+	public static void ExportImageIn6Bit(ImageModel imageModel, File exportFile)
+			throws IOException, URISyntaxException {
+		BufferedImage toExport = ImageUtilities.convertImageTo6BitColourPalette(imageModel.getImageData().getImage());
+		byte[] byteArray = createByteArray(toExport, imageModel.getDuration(), exportFile);
+
+		Files.write(exportFile.toPath(), byteArray);
+	}
+
+	private static byte[] createByteArray(BufferedImage toExport, double duration, File exportFile)
+			throws IOException, URISyntaxException {
 		List<Byte> bytes = new ArrayList<>();
 		bytes.addAll(getDurationBytes(duration));
 		
@@ -35,8 +65,8 @@ public class ImageExportUtilities {
 		for (int i = 0; i < bytes.size(); i++) {
 			byteArray[i] = bytes.get(i);
 		}
-		
-	    Files.write(exportFile.toPath(), byteArray);
+
+		return byteArray;
 	}
 	
 	private static List<Byte> getDurationBytes(double duration) {
