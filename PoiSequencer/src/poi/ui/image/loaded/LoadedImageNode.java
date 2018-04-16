@@ -63,10 +63,21 @@ public class LoadedImageNode implements Observable {
 		saveItem.setOnAction(event -> {
 			FileChooser fileChooser = new FileChooser();
 			fileChooser.getExtensionFilters().add(new ExtensionFilter("Bitmap Files", "*.bmp"));
+
+			if (imageData.getFilePath() != null) {
+				try {
+					fileChooser.setInitialDirectory(new File(imageData.getFilePath().toURI()).getParentFile());
+					fileChooser.setInitialFileName(new File(imageData.getFilePath().toURI()).getName());
+				} catch (Exception exptn) {
+					exptn.printStackTrace();
+				}
+			}
+			
 			File file = fileChooser.showSaveDialog(imageView.getScene().getWindow());
 			if (file != null) {
 				try {
 					ImageIO.write(imageData.getImage(), "bmp", file);
+					imageData.setFilePath(file.toURI().toURL());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
