@@ -14,10 +14,15 @@ import javafx.scene.layout.VBox;
 import poi.ui.image.timeline.scale.TimeScaleRuler;
 
 public class TimelineView {
-	
+
+	private static final double INITIAL_ZOOM_LEVEL = 10;
+	private static final double ZOOM_INCREMENT = 2;
+	private static final double MAX_ZOOM_LEVEL = INITIAL_ZOOM_LEVEL * Math.pow(ZOOM_INCREMENT, 4);
+	private static final double MIN_ZOOM_LEVEL = INITIAL_ZOOM_LEVEL / Math.pow(ZOOM_INCREMENT, 4);
+
 	private TimelineModel model;
 
-	private double zoomLevel = 1;
+	private double zoomLevel;
 	
 	private Map<ImageModel, TimelineImageNode> imageNodeMap = new HashMap<>();
 	
@@ -28,7 +33,7 @@ public class TimelineView {
 	public TimelineView(TimelineModel model) {
 		this.model = model;
 		hbox = new HBox();
-		zoomLevel = 10;
+		zoomLevel = INITIAL_ZOOM_LEVEL;
 		BorderPane borderPane = new BorderPane(hbox);
 		ruler = new TimeScaleRuler(model, 1);
 		borderPane.setBottom(ruler.getNode());
@@ -106,14 +111,26 @@ public class TimelineView {
 		minusButton.prefWidthProperty().bind(inner2.widthProperty());
 		pane2.getChildren().addAll(inner2, minusButton);
 
-		plusButton.setOnAction(event -> setZoomLevel(zoomLevel * 2));
-		minusButton.setOnAction(event -> setZoomLevel(zoomLevel / 2));
+		plusButton.setOnAction(event -> zoomIn());
+		minusButton.setOnAction(event -> zoomOut());
 
 		VBox.setVgrow(pane1, Priority.ALWAYS);
 		VBox.setVgrow(pane2, Priority.ALWAYS);
 		
 		borderPane.setRight(new VBox(pane1, pane2));
 		return borderPane;
+	}
+	
+	private void zoomIn() {
+		if (zoomLevel < MAX_ZOOM_LEVEL) {
+			setZoomLevel(zoomLevel * ZOOM_INCREMENT);
+		}
+	}
+	
+	private void zoomOut() {
+		if (zoomLevel > MIN_ZOOM_LEVEL) {
+			setZoomLevel(zoomLevel / ZOOM_INCREMENT);
+		}
 	}
 	
 }
