@@ -1,9 +1,11 @@
 TODO:
 
 - Convert LoadedImageView to use a LoadedImageModel
-- Export timeline
 - Save project to open later without exporting
-- Timeline should set ticks to "logical" values eg. 0.5, 1, 2, 5, 10, 20, 50, 100, etc.
+- Export timeline
+- Drag and drop images around the timeline
+  - Or at least swap with adjacent images
+
 
 DONE:
 
@@ -17,3 +19,4 @@ DONE:
 + Right click on timeline image to change duration
 + Add time scale to timeline
 + Time scale on timeline should be numbered
++ Timeline set ticks to "logical" values eg. 0.5, 1, 2, 5, 10, 20, 50, 100, etc.

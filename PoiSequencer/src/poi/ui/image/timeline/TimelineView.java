@@ -64,8 +64,25 @@ public class TimelineView {
 		for (TimelineImageNode img : imageNodeMap.values()) {
 			img.setWidth(zoomLevel * img.getDuration());
 		}
+
+		ruler.setTickIncrement(nearestIncrement(10.0 / zoomLevel));
+	}
+	
+	private double nearestIncrement(double requested) {
+		double[] options = {0.1, 0.5, 1, 2, 5, 10, 20, 50, 100};
 		
-		ruler.setTickIncrement(10.0 / zoomLevel);
+		double closeness = 10000;
+		double best = 0;
+		
+		for (double option : options) {
+			double newCloseness = Math.abs(1 - requested / option);
+			if (newCloseness < closeness) {
+				closeness = newCloseness;
+				best = option;
+			}
+		}
+		
+		return best;
 	}
 	
 	public double getZoomLevel() {

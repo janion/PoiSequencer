@@ -59,8 +59,9 @@ public class TimeScaleRuler {
 		pane.setPrefWidth(2);
 		HBox.setHgrow(pane, Priority.NEVER);
 		pane.setStyle("-fx-border-color: BLACK");
-		
-		if (time % (5 * tickIncrement) != 0) {
+
+		if (Math.abs(time % (5 * tickIncrement)) > 0.0001
+				&& Math.abs((time % (5 * tickIncrement)) - (5 * tickIncrement)) > 0.0001) {
 			pane.minHeightProperty().bind(hbox.heightProperty().divide(4));
 			pane.maxHeightProperty().bind(hbox.heightProperty().divide(4));
 		} else {
