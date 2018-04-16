@@ -28,8 +28,6 @@ import poi.observable.ObserverManagerImpl;
 import poi.observable.ObserverType;
 import poi.ui.image.ImageData;
 import poi.ui.image.edit.EditImageView;
-import poi.ui.image.timeline.ImageModel;
-import poi.ui.image.timeline.TimelineModel;
 import poi.utility.ImageUtilities;
 
 public class LoadedImageView implements Observable {

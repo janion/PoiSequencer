@@ -1,13 +1,7 @@
 package poi.ui;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
 import javafx.geometry.Orientation;
 import javafx.scene.control.SplitPane;
-import poi.ui.image.ImageData;
 import poi.ui.image.loaded.LoadedImageView;
 import poi.ui.image.timeline.ImageModel;
 import poi.ui.image.timeline.TimelineModel;

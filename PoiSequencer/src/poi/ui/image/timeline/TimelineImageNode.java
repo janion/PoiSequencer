@@ -1,7 +1,5 @@
 package poi.ui.image.timeline;
 
-import java.util.OptionalDouble;
-
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;

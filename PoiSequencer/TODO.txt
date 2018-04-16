@@ -1,5 +1,6 @@
 TODO:
 
+- Make better image duration dialog
 - Save project to open later without exporting
 - Export timeline
 - Drag and drop images around the timeline
