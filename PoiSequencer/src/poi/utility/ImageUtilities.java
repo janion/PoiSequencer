@@ -1,6 +1,8 @@
 package poi.utility;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -12,6 +14,14 @@ public class ImageUtilities {
 	
 	private ImageUtilities() {
 		// Do nothing
+	}
+	
+	public static BufferedImage copyImage(BufferedImage input) {
+		ColorModel cm = input.getColorModel();
+		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+		WritableRaster raster = input.copyData(null);
+		
+		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
 	  
 	public static Image resample(BufferedImage input, int scaleFactor) {

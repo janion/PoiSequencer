@@ -3,6 +3,8 @@ package poi.ui.image;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
+import poi.utility.ImageUtilities;
+
 public class ImageData {
 
 	private BufferedImage image;
@@ -10,6 +12,10 @@ public class ImageData {
 
 	public ImageData(BufferedImage image) {
 		this(image, null);
+	}
+	
+	public ImageData(ImageData toCopy) {
+		this(ImageUtilities.copyImage(toCopy.getImage()), toCopy.getFilePath());
 	}
 
 	public ImageData(BufferedImage image, URL filePath) {

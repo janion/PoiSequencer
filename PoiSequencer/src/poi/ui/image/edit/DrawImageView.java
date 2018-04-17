@@ -22,6 +22,7 @@ import poi.ui.image.edit.colour.ColouredPane;
 import poi.ui.image.edit.undo.ColourChange;
 import poi.ui.image.edit.undo.UndoFrame;
 import poi.ui.image.edit.undo.UndoStack;
+import poi.utility.ImageUtilities;
 
 public class DrawImageView {
 	
@@ -59,7 +60,7 @@ public class DrawImageView {
 	private Map<Pair<Integer, Integer>, ColouredPane> pixels;
 	
 	public DrawImageView(ImageData imageData, ColourSelector colourSelector) {
-		this.image = copyImage(imageData.getImage());
+		this.image = ImageUtilities.copyImage(imageData.getImage());
 		this.colourSelector = colourSelector;
 		undoStack = new UndoStack();
 		
@@ -88,14 +89,6 @@ public class DrawImageView {
 		}
 		
 		setupUndoRedo();
-	}
-	
-	private BufferedImage copyImage(BufferedImage bi) {
-		ColorModel cm = bi.getColorModel();
-		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-		WritableRaster raster = bi.copyData(null);
-		
-		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
 	
 	private void setupUndoRedo() {

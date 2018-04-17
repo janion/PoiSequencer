@@ -1,5 +1,10 @@
 TODO:
 
+- Allow better features in the edit view:
+  - Resize image (using drag)
+  - Fill tool
+  - Line tool (optional antialiassing)
+  - Select and cut/copy/paste/move
 - Make better image duration dialog
 - Save project to open later without exporting
 - Add export timeline button (single or multiple files? Will need different arduino codes to cope)
@@ -22,3 +27,4 @@ DONE:
 + Timeline set ticks to "logical" values eg. 0.5, 1, 2, 5, 10, 20, 50, 100, etc.
 + Min and max zoom levels
 + Convert LoadedImageView to use a LoadedImageModel
++ Ensured separation of image used in loaded and timeline views
