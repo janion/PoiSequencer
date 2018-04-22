@@ -1,6 +1,5 @@
 package poi.ui.image.edit;
 
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,14 +11,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import poi.ui.image.ImageData;
 import poi.ui.image.edit.colour.Colour;
-import poi.ui.image.edit.colour.ColourSelector;
 import poi.ui.image.edit.colour.ColouredPane;
-import poi.ui.image.edit.undo.ColourChange;
-import poi.ui.image.edit.undo.UndoFrame;
-import poi.ui.image.edit.undo.UndoStack;
-import poi.utility.ImageUtilities;
 import poi.utility.Pair;
 
 public class DrawImageView {
@@ -49,34 +42,33 @@ public class DrawImageView {
 		}
 	}
 	
-	private BufferedImage image;
 	private GridPane gridPane;
-	private ColourSelector colourSelector;
+	private DrawImageModel drawImageModel;
 	
-	private UndoStack undoStack;
-	private UndoFrame currentFrame;
 	private Map<Pair<Integer, Integer>, ColouredPane> pixels;
 	
-	public DrawImageView(ImageData imageData, ColourSelector colourSelector) {
-		this.image = ImageUtilities.copyImage(imageData.getImage());
-		this.colourSelector = colourSelector;
-		undoStack = new UndoStack();
+	public DrawImageView(DrawImageModel drawImageModel) {
+		this.drawImageModel = drawImageModel;
 		
 		gridPane = new GridPane();
 		pixels = new HashMap<>();
 		
-		for (int x = 0; x < image.getWidth(); x++) {
-			for (int y = 0; y < image.getHeight(); y++) {
-				ColouredPane colouredPane = new ColouredPane(new Colour(image.getRGB(x, y)));
+		for (int x = 0; x < drawImageModel.getImage().getWidth(); x++) {
+			for (int y = 0; y < drawImageModel.getImage().getHeight(); y++) {
+				ColouredPane colouredPane = new ColouredPane(new Colour(drawImageModel.getImage().getRGB(x, y)));
 				Pane pane = colouredPane.getNode();
+				IndexedPane indexedPane = new IndexedPane(colouredPane, x, y);
+				drawImageModel.getObserverManager().addObserver(DrawImageModel.PIXEL_COLOURED,
+						coordinates -> changePixelColour(coordinates.getFirst(), coordinates.getSecond(), indexedPane));
 				gridPane.add(new VBox(pane, new Pane()), x, y);
 				
-				IndexedPane indexedPane = new IndexedPane(colouredPane, x, y);
+				final int X = x;
+				final int Y = y;
 
-				pane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> singlePixelChange(indexedPane));
+				pane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> drawImageModel.setPixelColour(X, Y));
 				pane.addEventHandler(MouseDragEvent.DRAG_DETECTED, event -> startPaint(indexedPane));
-				pane.addEventHandler(MouseDragEvent.MOUSE_DRAG_ENTERED, event -> changePixelColour(indexedPane));
-				pane.addEventHandler(MouseDragEvent.MOUSE_DRAG_RELEASED, event -> endPaint());
+				pane.addEventHandler(MouseDragEvent.MOUSE_DRAG_ENTERED, event -> drawImageModel.setPixelColour(X, Y));
+				pane.addEventHandler(MouseDragEvent.MOUSE_DRAG_RELEASED, event -> drawImageModel.endPaint());
 				
 				pixels.put(new Pair<>(x, y), colouredPane);
 			}
@@ -93,97 +85,34 @@ public class DrawImageView {
 	
 	private void sceneSet(Scene scene) {
 		if (scene != null) {
-			scene.addEventHandler(KeyEvent.KEY_PRESSED, this::undo);
-			scene.addEventHandler(KeyEvent.KEY_PRESSED, this::redo);
+			scene.addEventHandler(KeyEvent.KEY_PRESSED, this::keyPressed);
 		}
 	}
 	
-	private void undo(KeyEvent event) {
-		if (KeyCode.Z.equals(event.getCode()) && event.isControlDown() && currentFrame == null) {
-			UndoFrame frame = undoStack.undo();
-			if (frame == null) {
-				return;
-			}
-			for (ColourChange colourChange : frame.getColourChanges()) {
-				ColouredPane pane = pixels.get(new Pair<>(colourChange.getX(), colourChange.getY()));
-				Colour oldColour = colourChange.getOldColour();
-				pane.setColour(oldColour);
-				image.setRGB(colourChange.getX(), colourChange.getY(), (oldColour.getR() << 16) + (oldColour.getG() << 8) + oldColour.getB());
-			}
-		}
-	}
-	
-	private void redo(KeyEvent event) {
-		if (KeyCode.Y.equals(event.getCode()) && event.isControlDown() && currentFrame == null) {
-			UndoFrame frame = undoStack.redo();
-			if (frame == null) {
-				return;
-			}
-			for (ColourChange colourChange : frame.getColourChanges()) {
-				ColouredPane pane = pixels.get(new Pair<>(colourChange.getX(), colourChange.getY()));
-				Colour newColour = colourChange.getNewColour();
-				pane.setColour(newColour);
-				image.setRGB(colourChange.getX(), colourChange.getY(), (newColour.getR() << 16) + (newColour.getG() << 8) + newColour.getB());
+	private void keyPressed(KeyEvent event) {
+		if (event.isControlDown()) {
+			if (KeyCode.Z.equals(event.getCode())) {
+				drawImageModel.undo();
+			} else if (KeyCode.Y.equals(event.getCode())) {
+				drawImageModel.redo();
 			}
 		}
 	}
 	
 	private void startPaint(IndexedPane pane) {
-		currentFrame = new UndoFrame();
 		pane.getPane().getNode().startFullDrag();
-		changePixelColour(pane);
+		drawImageModel.startPaint();
+		drawImageModel.setPixelColour(pane.getX(), pane.getY());
 	}
 	
-	private void endPaint() {
-		undoStack.addFrame(currentFrame);
-		currentFrame = null;
-	}
-	
-	private void singlePixelChange(IndexedPane pane) {
-		currentFrame = new UndoFrame();
-		changePixelColour(pane);
-		undoStack.addFrame(currentFrame);
-		currentFrame = null;
-	}
-	
-	private void changePixelColour(IndexedPane pane) {
-		Colour newColour = colourSelector.getColour();
-		int x = pane.getX();
-		int y = pane.getY();
-		
-		currentFrame.addColourChange(new ColourChange(x, y, new Colour(image.getRGB(x, y)), newColour));
-		
-		pane.getPane().setColour(newColour);
-		image.setRGB(x, y, (newColour.getR() << 16) + (newColour.getG() << 8) + newColour.getB());
-	}
-	
-	private void fill(IndexedPane pane) {
-		currentFrame = new UndoFrame();
-		fill(pane.getX(), pane.getY(), pane.getPane().getColour());
-		undoStack.addFrame(currentFrame);
-		currentFrame = null;
-	}
-	
-	private void fill(int x, int y, Colour initialColour) {
-		ColouredPane startPixel = pixels.get(new Pair<>(x, y));
-		if (startPixel == null) {
-			return;
-		}
-		
-		Colour newColour = colourSelector.getColour();
-		
-		if (!initialColour.equals(newColour) && startPixel.getColour().equals(initialColour)) {
-			startPixel.setColour(newColour);
-			currentFrame.addColourChange(new ColourChange(x, y, initialColour, newColour));
-			fill(x + 1, y, initialColour);
-			fill(x - 1, y, initialColour);
-			fill(x, y + 1, initialColour);
-			fill(x, y - 1, initialColour);
+	private void changePixelColour(int x, int y, IndexedPane indexedPane) {
+		if (x == indexedPane.getX() && y == indexedPane.getY()) {
+			indexedPane.getPane().setColour(drawImageModel.getColour(x, y));
 		}
 	}
 	
-	public BufferedImage getImage() {
-		return image;
+	public DrawImageModel getDrawImageModel() {
+		return drawImageModel;
 	}
 	
 	public GridPane getNode() {

@@ -6,17 +6,23 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import poi.ui.image.edit.DrawImageModel;
 
 public class ColourSelector {
+	
 	private ColourPickerDialog dlg;
-	private ColouredPane colour;
+	private ColouredPane colourPane;
+	private DrawImageModel drawImageModel;
 
-	public ColourSelector() {
-		colour = new ColouredPane();
-		colour.getNode().setPrefSize(30, 30);
-		colour.getNode().addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showColourPicker());
+	public ColourSelector(DrawImageModel drawImageModel) {
+		this.drawImageModel = drawImageModel;
+		colourPane = new ColouredPane();
+		colourPane.getNode().setPrefSize(30, 30);
+		colourPane.getNode().addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showColourPicker());
 		
-		colour.getNode().sceneProperty().addListener((observable, oldVal, newVal) -> {
+		drawImageModel.getObserverManager().addObserver(DrawImageModel.COLOUR_SELECTED, colourPane::setColour);
+		
+		colourPane.getNode().sceneProperty().addListener((observable, oldVal, newVal) -> {
 			sceneSet(newVal);
 		});
 	}
@@ -46,11 +52,11 @@ public class ColourSelector {
 	
 	private void showColourPicker() {
 		if (dlg == null) {
-			ColourPickerDialog dlg = new ColourPickerDialog(colour::setColour);
+			ColourPickerDialog dlg = new ColourPickerDialog(drawImageModel::setSelectedColour);
 			Stage dlgStage = dlg.getStage();
 			dlgStage.initStyle(StageStyle.UNDECORATED);
 
-			Bounds bounds = colour.getNode().localToScreen(colour.getNode().getBoundsInLocal());
+			Bounds bounds = colourPane.getNode().localToScreen(colourPane.getNode().getBoundsInLocal());
 			dlgStage.setX(bounds.getMinX());
 			dlgStage.setY(bounds.getMinY());
 			dlgStage.setOnHidden(closeEvent -> clearDialog());
@@ -63,11 +69,7 @@ public class ColourSelector {
 	}
 	
 	public Pane getNode() {
-		return colour.getNode();
-	}
-	
-	public Colour getColour() {
-		return colour.getColour();
+		return colourPane.getNode();
 	}
 
 }

@@ -10,6 +10,7 @@ import poi.ui.image.edit.colour.Colour;
 import poi.ui.image.edit.undo.ColourChange;
 import poi.ui.image.edit.undo.UndoFrame;
 import poi.ui.image.edit.undo.UndoStack;
+import poi.utility.ImageUtilities;
 import poi.utility.Pair;
 
 public class DrawImageModel implements Observable {
@@ -27,8 +28,9 @@ public class DrawImageModel implements Observable {
 	private UndoFrame currentFrame;
 	
 	public DrawImageModel(BufferedImage image) {
-		this.image = image;
+		this.image = ImageUtilities.copyImage(image);
 		
+		undoStack = new UndoStack();
 		drawMode = DrawMode.PENCIL;
 		selectedColour = new Colour(0, 0,  0);
 	}
@@ -49,19 +51,32 @@ public class DrawImageModel implements Observable {
 		}
 	}
 	
+	public void startPaint() {
+		currentFrame = new UndoFrame();
+	}
+	
+	public void endPaint() {
+		undoStack.addFrame(currentFrame);
+		currentFrame = null;
+	}
+	
 	private void setSinglePixelColour(int x, int y, Colour colour) {
 		boolean singlePixel = currentFrame == null;
 		if (singlePixel) {
 			currentFrame = new UndoFrame();
 		}
 		Colour initialColour = new Colour(image.getRGB(x, y));
-		image.setRGB(x, y, selectedColour.toInt());
-		observerManager.notifyObservers(PIXEL_COLOURED, new Pair<>(x, y));
-		currentFrame.addColourChange(new ColourChange(x, y, initialColour, selectedColour));
+		setSinglePixelColourWithoutUndoFrame(x, y, colour);
+		currentFrame.addColourChange(new ColourChange(x, y, initialColour, colour));
 		if (singlePixel) {
 			undoStack.addFrame(currentFrame);
 			currentFrame = null;
 		}
+	}
+	
+	private void setSinglePixelColourWithoutUndoFrame(int x, int y, Colour colour) {
+		image.setRGB(x, y, colour.toInt());
+		observerManager.notifyObservers(PIXEL_COLOURED, new Pair<>(x, y));
 	}
 	
 	private void fill(int x, int y) {
@@ -91,7 +106,7 @@ public class DrawImageModel implements Observable {
 			return;
 		}
 		for (ColourChange colourChange : frame.getColourChanges()) {
-			setSinglePixelColour(colourChange.getX(), colourChange.getY(), colourChange.getOldColour());
+			setSinglePixelColourWithoutUndoFrame(colourChange.getX(), colourChange.getY(), colourChange.getOldColour());
 		}
 	}
 	
@@ -101,7 +116,7 @@ public class DrawImageModel implements Observable {
 			return;
 		}
 		for (ColourChange colourChange : frame.getColourChanges()) {
-			setSinglePixelColour(colourChange.getX(), colourChange.getY(), colourChange.getNewColour());
+			setSinglePixelColourWithoutUndoFrame(colourChange.getX(), colourChange.getY(), colourChange.getNewColour());
 		}
 	}
 	
@@ -111,6 +126,10 @@ public class DrawImageModel implements Observable {
 
 	public BufferedImage getImage() {
 		return image;
+	}
+	
+	public Colour getColour(int x, int y) {
+		return new Colour(image.getRGB(x, y));
 	}
 
 	@Override

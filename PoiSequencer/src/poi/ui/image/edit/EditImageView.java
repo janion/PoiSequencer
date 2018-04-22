@@ -17,6 +17,7 @@ public class EditImageView {
 	
 	private BorderPane borderPane;
 	private ImageData image;
+	private DrawImageModel drawImageModel;
 	private DrawImageView drawImageView;
 	
 	private boolean submitted = false;
@@ -30,11 +31,12 @@ public class EditImageView {
 		
 		borderPane = new BorderPane();
 		
-		ColourSelector colourSelector = new ColourSelector();
+		drawImageModel = new DrawImageModel(image.getImage());
+		ColourSelector colourSelector = new ColourSelector(drawImageModel);
 		colourSelector.getNode().setMaxSize(30, 30);
 		borderPane.setRight(colourSelector.getNode());
 		
-		drawImageView = new DrawImageView(image, colourSelector);
+		drawImageView = new DrawImageView(drawImageModel);
 		borderPane.setCenter(new ScrollPane(drawImageView.getNode()));
 		
 
@@ -54,7 +56,7 @@ public class EditImageView {
 	private void close(boolean isSubmitted) {
 		this.submitted = isSubmitted;
 		if (isSubmitted) {
-			image.setImage(drawImageView.getImage());
+			image.setImage(drawImageModel.getImage());
 		}
 		borderPane.getScene().getWindow().hide();
 	}
