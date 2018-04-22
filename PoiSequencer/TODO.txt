@@ -11,7 +11,8 @@ TODO:
   - Or at least swap with adjacent images
 - Add text as well as images (Will require additional arduino code)
 - Loading and saving should be done on separate threads?
-- Loaded image node should notify observers of save requested instead of saving itself
+- Loaded image node should notify observers of save requested instead of doing the saving itself
+  - Home view should not be doing so much processing
 
 
 DONE:
@@ -35,4 +36,4 @@ DONE:
     * .csv holding order of loaded files (file name, saved file name)
     * .csv holding order and duration of images (file name, saved file name, duration)
     * .bmp files for all loaded and timeline images
-- Add loaded project model to home view
++ Add loaded project model to home view

@@ -1,22 +1,31 @@
 package poi.ui;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
 import javafx.geometry.Orientation;
+import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
 import poi.ui.image.ImageData;
+import poi.ui.image.edit.EditImageView;
 import poi.ui.image.loaded.LoadedImageModel;
+import poi.ui.image.loaded.LoadedImageNode;
 import poi.ui.image.loaded.LoadedImageView;
 import poi.ui.image.timeline.ImageModel;
 import poi.ui.image.timeline.TimelineModel;
 import poi.ui.image.timeline.TimelineView;
+import poi.utility.ImageUtilities;
 import poi.utility.ProjectUtilities;
 
 public class HomeView {
@@ -45,23 +54,62 @@ public class HomeView {
 	}
 	
 	private MenuBar createMenuBar() {
-		MenuItem saveItem = new MenuItem("Save Project");
-		saveItem.setOnAction(event -> saveProject());
-		MenuItem openItem = new MenuItem("Open Project");
-		openItem.setOnAction(event -> loadProject());
-		MenuItem newItem = new MenuItem("New Project");
-		newItem.setOnAction(event -> newProject());
+		MenuItem saveProjectItem = new MenuItem("Save Project");
+		saveProjectItem.setOnAction(event -> saveProject());
+		MenuItem openProjectItem = new MenuItem("Open Project");
+		openProjectItem.setOnAction(event -> loadProject());
+		MenuItem newProjectItem = new MenuItem("New Project");
+		newProjectItem.setOnAction(event -> newProject());
 		MenuItem exportItem = new MenuItem("Export Timeline");
 		MenuItem quitItem = new MenuItem("Quit");
 		quitItem.setOnAction(event -> borderPane.getScene().getWindow().hide());
 		
 		Menu fileMenu = new Menu("File");
-		fileMenu.getItems().addAll(saveItem, openItem, newItem, exportItem, quitItem);
+		fileMenu.getItems().addAll(saveProjectItem, openProjectItem, newProjectItem, exportItem, quitItem);
+		
+		MenuItem newImageItem = new MenuItem("New");
+		newImageItem.setOnAction(event -> openEditView());
+		MenuItem loadImageItem = new MenuItem("Load");
+		loadImageItem.setOnAction(event -> loadImage());
+		
+		Menu imageMenu = new Menu("Image");
+		imageMenu.getItems().addAll(newImageItem, loadImageItem);
 		
 		MenuBar menuBar = new MenuBar();
-		menuBar.getMenus().add(fileMenu);
+		menuBar.getMenus().addAll(fileMenu, imageMenu);
 		
 		return menuBar;
+	}
+	
+	private void openEditView() {
+		Stage stage = new Stage();
+		stage.initModality(Modality.WINDOW_MODAL);
+		stage.initOwner(borderPane.getScene().getWindow());
+		EditImageView editImageView = new EditImageView();
+		stage.setScene(new Scene(editImageView.getNode()));
+		stage.showAndWait();
+		
+		if (editImageView.isSubmitted()) {
+			loadedImageModel.addImage(editImageView.getImageData());
+		}
+	}
+	
+	private void loadImage() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("Bitmap Files", "*.bmp"));
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("JPEG Files", "*.jpg"));
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG Files", "*.png"));
+		File file = fileChooser.showOpenDialog(borderPane.getScene().getWindow());
+		
+		if (file != null) {
+			try {
+				BufferedImage img = ImageUtilities.compressImageTo6BitColourPalette(ImageIO.read(file), 16);
+				ImageData imageData = new ImageData(img, file.toURI().toURL());
+				loadedImageModel.addImage(imageData);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	private void saveProject() {
