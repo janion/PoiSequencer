@@ -12,6 +12,7 @@ import poi.ui.image.timeline.TimelineView;
 
 public class HomeView {
 	
+	private SplitPane splitPane;
 	private BorderPane borderPane;
 	private CurrentProjectModel currentProjectModel;
 	private LoadedImageModel loadedImageModel;
@@ -27,12 +28,16 @@ public class HomeView {
 		LoadedImageView loadedImageView = new LoadedImageView(loadedImageModel);
 		loadedImageView.getObserverManager().addObserver(LoadedImageView.REQUEST_ADD_TO_TIMELINE,
 				imageData -> timelineModel.addImage(new ImageModel(10.0, new ImageData(imageData))));
-		SplitPane splitPane = new SplitPane(loadedImageView.getNode(), timeline.getNode());
+		splitPane = new SplitPane(loadedImageView.getNode(), timeline.getNode());
 		splitPane.setOrientation(Orientation.VERTICAL);
-//		splitPane.setDividerPosition(0, 1.0);
+		splitPane.setDividerPosition(0, 0.3);
 		
 		borderPane = new BorderPane(splitPane);
 		borderPane.setTop(new HomeViewMenuBar(currentProjectModel, loadedImageModel, timelineModel).getMenuBar());
+	}
+	
+	public void setInitialDividerPosition() {
+		splitPane.setDividerPosition(0, 0.75);
 	}
 	
 	public BorderPane getNode() {

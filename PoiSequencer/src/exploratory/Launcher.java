@@ -9,12 +9,15 @@ public class Launcher extends Application {
 	
 	@Override
 	public void start(Stage stage) throws Exception {
-		Scene scene = new Scene(new HomeView().getNode());
+		HomeView homeView = new HomeView();
+		Scene scene = new Scene(homeView.getNode());
 
 		stage.setScene(scene);
-		stage.setWidth(200);
-		stage.setHeight(200);
+		stage.setWidth(700);
+		stage.setHeight(500);
 		stage.show();
+		
+		homeView.setInitialDividerPosition();
 	}
 
 	public static void main(String[] args) {

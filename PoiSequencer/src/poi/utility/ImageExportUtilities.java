@@ -28,10 +28,11 @@ public class ImageExportUtilities {
 			
 			if (firstFile) {
 				Files.write(exportFile.toPath(), byteArray);
+				firstFile = false;
 			} else {
 				Files.write(exportFile.toPath(), byteArray, APPEND);
 			}
-			Files.write(exportFile.toPath(), new byte[] {'E', 'N', 'D'}, APPEND);
+			Files.write(exportFile.toPath(), new byte[] {(byte) 255}, APPEND);
 		}
 	}
 

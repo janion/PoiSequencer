@@ -3,6 +3,7 @@ package poi.ui;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javax.imageio.ImageIO;
 
@@ -10,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
@@ -18,6 +20,7 @@ import poi.ui.image.ImageData;
 import poi.ui.image.edit.EditImageView;
 import poi.ui.image.loaded.LoadedImageModel;
 import poi.ui.image.timeline.TimelineModel;
+import poi.utility.ImageExportUtilities;
 import poi.utility.ImageUtilities;
 import poi.utility.ProjectUtilities;
 
@@ -51,11 +54,16 @@ public class HomeViewMenuBar {
 		MenuItem newProjectItem = new MenuItem("New Project");
 		newProjectItem.setOnAction(event -> newProject());
 		MenuItem exportItem = new MenuItem("Export Timeline");
+		exportItem.setOnAction(event -> exportTimeline());
 		MenuItem quitItem = new MenuItem("Quit");
 		quitItem.setOnAction(event -> menuBar.getScene().getWindow().hide());
 		
 		Menu fileMenu = new Menu("File");
-		fileMenu.getItems().addAll(saveProjectItem, openProjectItem, newProjectItem, exportItem, quitItem);
+		fileMenu.getItems().addAll(saveProjectItem, openProjectItem, newProjectItem);
+		fileMenu.getItems().add(new SeparatorMenuItem());
+		fileMenu.getItems().addAll(exportItem);
+		fileMenu.getItems().add(new SeparatorMenuItem());
+		fileMenu.getItems().addAll(quitItem);
 		
 		return fileMenu;
 	}
@@ -163,6 +171,31 @@ public class HomeViewMenuBar {
 		loadedImageModel.clear();
 		timelineModel.clear();
 		currentProjectModel.setCurrentProject(null);
+	}
+	
+	private void exportTimeline() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("Poi Timeline Files", "*.poi"));
+
+		try {
+			if (currentProjectModel.getLastTimelineExport() != null) {
+				File lastExport = new File(currentProjectModel.getLastTimelineExport().toURI());
+				fileChooser.setInitialDirectory(lastExport.getParentFile());
+				fileChooser.setInitialFileName(lastExport.getName());
+			}
+		} catch (Exception exptn) {
+			exptn.printStackTrace();
+		}
+		
+		File file = fileChooser.showSaveDialog(menuBar.getScene().getWindow());
+		if (file != null) {
+			try {
+				ImageExportUtilities.ExportTimelineIn6Bit(timelineModel, file);
+				currentProjectModel.setLastTimelineExport(file.toURI().toURL());
+			} catch (IOException | URISyntaxException exptn) {
+				exptn.printStackTrace();
+			}
+		}
 	}
 	
 	public MenuBar getMenuBar() {
