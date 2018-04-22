@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -45,6 +46,7 @@ public class EditImageView {
 		ImageView selectedTool = new ImageView();
 		updateImage(selectedTool, drawImageModel.getDrawMode());
 		BorderPane pane = new BorderPane(selectedTool);
+		pane.setPadding(new Insets(5));
 		BorderPane.setAlignment(selectedTool, Pos.CENTER);
 		borderPane.setRight(new VBox(colourSelector.getNode(), pane, createPencilButton(selectedTool),
 				createPaintPotButton(selectedTool), new Pane()));
