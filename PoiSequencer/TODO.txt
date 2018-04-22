@@ -5,7 +5,6 @@ TODO:
   - Fill tool
   - Line tool (optional antialiassing)
   - Select and cut/copy/paste/move
-- Add controls for what draw tool is being used
 - Make better image duration dialog
 - Decide if timeline export should be single or multiple files? Will need different arduino codes to cope
   - Currently single file
@@ -42,3 +41,4 @@ DONE:
 + Add loaded project model to home view
 + Export timeline menu item (single or multiple files? Will need different arduino codes to cope)
 + Model for drawing image
++ Controls for what draw tool is being used

@@ -3,6 +3,7 @@ package poi.ui.image.loaded;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
@@ -51,6 +52,7 @@ public class LoadedImageView implements Observable {
 		scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 
 		borderPane = new BorderPane(scrollPane);
+		flowPane.setPadding(new Insets(5));
 	}
 	
 	private void openEditView(ImageData imageData, LoadedImageNode loadedImageNode) {

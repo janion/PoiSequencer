@@ -17,6 +17,7 @@ public class DrawImageModel implements Observable {
 	
 	public static final ObserverType<Colour> COLOUR_SELECTED = new ObserverType<>();
 	public static final ObserverType<Pair<Integer, Integer>> PIXEL_COLOURED = new ObserverType<>();
+	public static final ObserverType<DrawMode> DRAW_MODE = new ObserverType<>();
 	
 	private ObserverManager observerManager = new ObserverManagerImpl();
 	
@@ -120,6 +121,11 @@ public class DrawImageModel implements Observable {
 		}
 	}
 	
+	public void setDrawMode(DrawMode drawMode) {
+		this.drawMode = drawMode;
+		observerManager.notifyObservers(DRAW_MODE, drawMode);
+	}
+	
 	public Colour getSelectedColour() {
 		return selectedColour;
 	}
@@ -130,6 +136,10 @@ public class DrawImageModel implements Observable {
 	
 	public Colour getColour(int x, int y) {
 		return new Colour(image.getRGB(x, y));
+	}
+	
+	public DrawMode getDrawMode() {
+		return drawMode;
 	}
 
 	@Override

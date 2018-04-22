@@ -1,6 +1,10 @@
 package poi.ui.image.edit.colour;
 
+import java.awt.MouseInfo;
+import java.awt.Point;
+
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -52,7 +56,7 @@ public class ColourSelector {
 	
 	private void showColourPicker() {
 		if (dlg == null) {
-			ColourPickerDialog dlg = new ColourPickerDialog(drawImageModel::setSelectedColour);
+			dlg = new ColourPickerDialog(drawImageModel::setSelectedColour);
 			Stage dlgStage = dlg.getStage();
 			dlgStage.initStyle(StageStyle.UNDECORATED);
 
@@ -61,6 +65,10 @@ public class ColourSelector {
 			dlgStage.setY(bounds.getMinY());
 			dlgStage.setOnHidden(closeEvent -> clearDialog());
 			dlgStage.show();
+			Point p = MouseInfo.getPointerInfo().getLocation();
+			if (!bounds.contains(new Point2D(p.getX(), p.getY()))) {
+				dlgStage.hide();
+			}
 		}
 	}
 	
