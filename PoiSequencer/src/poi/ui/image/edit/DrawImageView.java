@@ -12,7 +12,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.util.Pair;
 import poi.ui.image.ImageData;
 import poi.ui.image.edit.colour.Colour;
 import poi.ui.image.edit.colour.ColourSelector;
@@ -21,6 +20,7 @@ import poi.ui.image.edit.undo.ColourChange;
 import poi.ui.image.edit.undo.UndoFrame;
 import poi.ui.image.edit.undo.UndoStack;
 import poi.utility.ImageUtilities;
+import poi.utility.Pair;
 
 public class DrawImageView {
 	
@@ -163,6 +163,31 @@ public class DrawImageView {
 		
 		pane.getPane().setColour(newColour);
 		image.setRGB(x, y, (newColour.getR() << 16) + (newColour.getG() << 8) + newColour.getB());
+	}
+	
+	private void fill(IndexedPane pane) {
+		currentFrame = new UndoFrame();
+		fill(pane.getX(), pane.getY(), pane.getPane().getColour());
+		undoStack.addFrame(currentFrame);
+		currentFrame = null;
+	}
+	
+	private void fill(int x, int y, Colour initialColour) {
+		ColouredPane startPixel = pixels.get(new Pair<>(x, y));
+		if (startPixel == null) {
+			return;
+		}
+		
+		Colour newColour = colourSelector.getColour();
+		
+		if (!initialColour.equals(newColour) && startPixel.getColour().equals(initialColour)) {
+			startPixel.setColour(newColour);
+			currentFrame.addColourChange(new ColourChange(x, y, initialColour, newColour));
+			fill(x + 1, y, initialColour);
+			fill(x - 1, y, initialColour);
+			fill(x, y + 1, initialColour);
+			fill(x, y - 1, initialColour);
+		}
 	}
 	
 	public BufferedImage getImage() {
