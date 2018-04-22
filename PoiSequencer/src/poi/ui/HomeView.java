@@ -22,10 +22,13 @@ import poi.utility.ProjectUtilities;
 public class HomeView {
 	
 	private BorderPane borderPane;
+	private CurrentProjectModel currentProjectModel;
 	private LoadedImageModel loadedImageModel;
 	private TimelineModel timelineModel;
 	
 	public HomeView() {
+		currentProjectModel = new CurrentProjectModel();
+		
 		timelineModel = new TimelineModel();
 		TimelineView timeline = new TimelineView(timelineModel);
 		
@@ -43,12 +46,14 @@ public class HomeView {
 	
 	private MenuBar createMenuBar() {
 		MenuItem saveItem = new MenuItem("Save Project");
-		saveItem.setOnAction(event -> save());
+		saveItem.setOnAction(event -> saveProject());
 		MenuItem openItem = new MenuItem("Open Project");
-		openItem.setOnAction(event -> load());
+		openItem.setOnAction(event -> loadProject());
 		MenuItem newItem = new MenuItem("New Project");
+		newItem.setOnAction(event -> newProject());
 		MenuItem exportItem = new MenuItem("Export Timeline");
 		MenuItem quitItem = new MenuItem("Quit");
+		quitItem.setOnAction(event -> borderPane.getScene().getWindow().hide());
 		
 		Menu fileMenu = new Menu("File");
 		fileMenu.getItems().addAll(saveItem, openItem, newItem, exportItem, quitItem);
@@ -59,36 +64,66 @@ public class HomeView {
 		return menuBar;
 	}
 	
-	private void save() {
+	private void saveProject() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.getExtensionFilters().add(new ExtensionFilter("Poi Project Files", "*.pp"));
-		
-		// TODO set inital file and directory if project loaded or saved
+
+		try {
+			if (currentProjectModel.getCurrentProject() != null) {
+				File currentModel = new File(currentProjectModel.getCurrentProject().toURI());
+				fileChooser.setInitialDirectory(currentModel.getParentFile());
+				fileChooser.setInitialFileName(currentModel.getName());
+			} else if (currentProjectModel.getLastProject() != null) {
+				File lastModel = new File(currentProjectModel.getLastProject().toURI());
+				fileChooser.setInitialDirectory(lastModel.getParentFile());
+			}
+		} catch (Exception exptn) {
+			exptn.printStackTrace();
+		}
 		
 		File file = fileChooser.showSaveDialog(borderPane.getScene().getWindow());
 		if (file != null) {
 			try {
 				ProjectUtilities.saveProject(loadedImageModel, timelineModel, file);
+				currentProjectModel.setCurrentProject(file.toURI().toURL());
 			} catch (IOException exptn) {
 				exptn.printStackTrace();
 			}
 		}
 	}
 	
-	private void load() {
+	private void loadProject() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.getExtensionFilters().add(new ExtensionFilter("Poi Project Files", "*.pp"));
-		
-		// TODO set inital file and directory if project loaded or saved
+
+		try {
+			if (currentProjectModel.getCurrentProject() != null) {
+				File currentModel = new File(currentProjectModel.getCurrentProject().toURI());
+				fileChooser.setInitialDirectory(currentModel.getParentFile());
+				fileChooser.setInitialFileName(currentModel.getName());
+			} else if (currentProjectModel.getLastProject() != null) {
+				File lastModel = new File(currentProjectModel.getLastProject().toURI());
+				fileChooser.setInitialDirectory(lastModel.getParentFile());
+			}
+		} catch (Exception exptn) {
+			exptn.printStackTrace();
+		}
 		
 		File file = fileChooser.showOpenDialog(borderPane.getScene().getWindow());
 		if (file != null) {
 			try {
 				ProjectUtilities.loadProject(loadedImageModel, timelineModel, file);
+				currentProjectModel.setCurrentProject(file.toURI().toURL());
 			} catch (IOException exptn) {
 				exptn.printStackTrace();
 			}
 		}
+	}
+	
+	private void newProject() {
+		loadedImageModel.clear();
+		timelineModel.clear();
+		currentProjectModel.setCurrentProject(null);
 	}
 	
 	public BorderPane getNode() {

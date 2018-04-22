@@ -71,8 +71,9 @@ public class LoadedImageNode implements Observable {
 
 		if (imageData.getFilePath() != null) {
 			try {
-				fileChooser.setInitialDirectory(new File(imageData.getFilePath().toURI()).getParentFile());
-				fileChooser.setInitialFileName(new File(imageData.getFilePath().toURI()).getName());
+				File file = new File(imageData.getFilePath().toURI());
+				fileChooser.setInitialDirectory(file.getParentFile());
+				fileChooser.setInitialFileName(file.getName());
 			} catch (Exception exptn) {
 				exptn.printStackTrace();
 			}

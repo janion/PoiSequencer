@@ -31,6 +31,7 @@ public class TimeScaleRuler {
 
 		timelineModel.getObserverManager().addObserver(TimelineModel.IMAGE_ADDED, imageModelAndIndex -> imageAdded(imageModelAndIndex.getFirst()));
 		timelineModel.getObserverManager().addObserver(TimelineModel.IMAGE_REMOVED, this::imageRemoved);
+		timelineModel.getObserverManager().addObserver(TimelineModel.CLEARED, nullValue -> refresh());
 	}
 	
 	private void imageAdded(ImageModel imageModel) {
