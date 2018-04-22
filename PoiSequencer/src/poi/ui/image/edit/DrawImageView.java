@@ -67,11 +67,7 @@ public class DrawImageView {
 		
 		for (int x = 0; x < image.getWidth(); x++) {
 			for (int y = 0; y < image.getHeight(); y++) {
-				int rgb = image.getRGB(x, y);
-				int red = (rgb >> 16) & 0xFF;
-				int green = (rgb >> 8) & 0xFF;
-				int blue = rgb & 0xFF;
-				ColouredPane colouredPane = new ColouredPane(new Colour(red, green, blue));
+				ColouredPane colouredPane = new ColouredPane(new Colour(image.getRGB(x, y)));
 				Pane pane = colouredPane.getNode();
 				gridPane.add(new VBox(pane, new Pane()), x, y);
 				
@@ -155,11 +151,7 @@ public class DrawImageView {
 		int x = pane.getX();
 		int y = pane.getY();
 		
-		int rgb = image.getRGB(x, y);
-		int r = (rgb >> 16) & 0xff;
-		int g = (rgb >> 8) & 0xff;
-		int b = rgb & 0xff;
-		currentFrame.addColourChange(new ColourChange(x, y, new Colour(r, g, b), newColour));
+		currentFrame.addColourChange(new ColourChange(x, y, new Colour(image.getRGB(x, y)), newColour));
 		
 		pane.getPane().setColour(newColour);
 		image.setRGB(x, y, (newColour.getR() << 16) + (newColour.getG() << 8) + newColour.getB());

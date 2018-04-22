@@ -5,6 +5,10 @@ public class Colour {
 	private int r;
 	private int g;
 	private int b;
+	
+	public Colour(int rgb) {
+		this((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
+	}
 
 	public Colour(int r, int g, int b) {
 		this.r = r;
@@ -22,6 +26,10 @@ public class Colour {
 
 	public int getB() {
 		return b;
+	}
+	
+	public int toInt() {
+		return (r << 16) + (g << 8) + b;
 	}
 
 	@Override
