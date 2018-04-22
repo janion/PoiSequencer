@@ -1,7 +1,6 @@
 package poi.utility;
 
 import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.CREATE;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -20,7 +19,7 @@ public class ImageExportUtilities {
 		// Do nothing
 	}
 
-	public static void ExportImageIn6Bit(TimelineModel timelineModel, File exportFile)
+	public static void ExportTimelineIn6Bit(TimelineModel timelineModel, File exportFile)
 			throws IOException, URISyntaxException {
 		boolean firstFile = true;
 		for (ImageModel imageModel : timelineModel.getImages()) {
@@ -30,9 +29,9 @@ public class ImageExportUtilities {
 			if (firstFile) {
 				Files.write(exportFile.toPath(), byteArray);
 			} else {
-				Files.write(exportFile.toPath(), byteArray, APPEND, CREATE);
+				Files.write(exportFile.toPath(), byteArray, APPEND);
 			}
-			Files.write(exportFile.toPath(), new byte[] {'E', 'N', 'D'}, APPEND, CREATE);
+			Files.write(exportFile.toPath(), new byte[] {'E', 'N', 'D'}, APPEND);
 		}
 	}
 

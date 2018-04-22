@@ -14,6 +14,7 @@ public class TimelineModel implements Observable {
 
 	public static final ObserverType<Pair<ImageModel, Integer>> IMAGE_ADDED = new ObserverType<>();
 	public static final ObserverType<ImageModel> IMAGE_REMOVED = new ObserverType<>();
+	public static final ObserverType<Void> CLEARED = new ObserverType<>();
 	
 	private ObserverManager observerManager = new ObserverManagerImpl();
 	
@@ -36,6 +37,11 @@ public class TimelineModel implements Observable {
 	public void removeImage(ImageModel image) {
 		images.remove(image);
 		observerManager.notifyObservers(IMAGE_REMOVED, image);
+	}
+	
+	public void clear() {
+		images.clear();
+		observerManager.notifyObservers(CLEARED, null);
 	}
 	
 	@Override

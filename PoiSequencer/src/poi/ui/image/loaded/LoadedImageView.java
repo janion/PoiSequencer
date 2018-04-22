@@ -42,12 +42,14 @@ public class LoadedImageView implements Observable {
 	
 	private ObserverManager observerManager = new ObserverManagerImpl();
 	
-	public LoadedImageView() {
+	public LoadedImageView(LoadedImageModel imageModel) {
+		this.imageModel = imageModel;
+		
 		imageNodes = new HashMap<>();
 		
-		imageModel = new LoadedImageModel();
 		imageModel.getObserverManager().addObserver(LoadedImageModel.IMAGE_ADDED, this::addImage);
 		imageModel.getObserverManager().addObserver(LoadedImageModel.IMAGE_REMOVED, this::removeImage);
+		imageModel.getObserverManager().addObserver(LoadedImageModel.CLEARED, nullValue -> clear());
 		
 		flowPane = new FlowPane();
 		flowPane.setVgap(4);
@@ -80,8 +82,7 @@ public class LoadedImageView implements Observable {
 			try {
 				BufferedImage img = ImageUtilities.compressImageTo6BitColourPalette(ImageIO.read(file), 16);
 				ImageData imageData = new ImageData(img, file.toURI().toURL());
-				LoadedImageNode loadedImage = createLoadedImageNode(imageData);
-				flowPane.getChildren().add(loadedImage.getNode());
+				imageModel.addImage(imageData);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -116,6 +117,11 @@ public class LoadedImageView implements Observable {
 		if (image != null) {
 			flowPane.getChildren().remove(loadedImage.getNode());
 		}
+	}
+	
+	private void clear() {
+		imageNodes.clear();
+		flowPane.getChildren().clear();
 	}
 	
 	private LoadedImageNode createLoadedImageNode(ImageData imageData) {

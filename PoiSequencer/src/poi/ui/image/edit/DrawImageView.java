@@ -1,8 +1,6 @@
 package poi.ui.image.edit;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 import java.util.HashMap;
 import java.util.Map;
 

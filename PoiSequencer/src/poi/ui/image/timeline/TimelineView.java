@@ -29,22 +29,60 @@ public class TimelineView {
 	private HBox hbox;
 	private TimeScaleRuler ruler;
 	private ScrollPane scrollPane;
+	private BorderPane borderPane;
 
 	public TimelineView(TimelineModel model) {
 		this.model = model;
 		hbox = new HBox();
 		zoomLevel = INITIAL_ZOOM_LEVEL;
-		BorderPane borderPane = new BorderPane(hbox);
+		BorderPane internalBorderPane = new BorderPane(hbox);
 		ruler = new TimeScaleRuler(model, 1);
-		borderPane.setBottom(ruler.getNode());
+		internalBorderPane.setBottom(ruler.getNode());
 		
-		scrollPane = new ScrollPane(borderPane);
+		scrollPane = new ScrollPane(internalBorderPane);
 		scrollPane.setFitToHeight(true);
+		
+		borderPane = new BorderPane(scrollPane);
+		
+		Pane pane1 = new StackPane();
+		Pane inner1 = new StackPane();
+		Button plusButton = new Button("+");
+		plusButton.prefHeightProperty().bind(inner1.heightProperty());
+//		plusButton.prefWidthProperty().bind(inner1.widthProperty());
+		pane1.getChildren().addAll(inner1, plusButton);
+		
+		Pane pane2 = new StackPane();
+		Pane inner2 = new StackPane();
+		Button minusButton = new Button("-");
+		minusButton.prefHeightProperty().bind(inner2.heightProperty());
+		minusButton.prefWidthProperty().bind(inner2.widthProperty());
+		pane2.getChildren().addAll(inner2, minusButton);
+
+		plusButton.setOnAction(event -> zoomIn());
+		minusButton.setOnAction(event -> zoomOut());
+
+		VBox.setVgrow(pane1, Priority.ALWAYS);
+		VBox.setVgrow(pane2, Priority.ALWAYS);
+		
+		borderPane.setRight(new VBox(pane1, pane2));
 
 		model.getObserverManager().addObserver(TimelineModel.IMAGE_ADDED,
 				dataAndIndex -> addImage(dataAndIndex.getFirst(), dataAndIndex.getSecond()));
 
 		model.getObserverManager().addObserver(TimelineModel.IMAGE_REMOVED, this::removeImage);
+		model.getObserverManager().addObserver(TimelineModel.CLEARED, nullValue -> clear());
+	}
+	
+	private void zoomIn() {
+		if (zoomLevel < MAX_ZOOM_LEVEL) {
+			setZoomLevel(zoomLevel * ZOOM_INCREMENT);
+		}
+	}
+	
+	private void zoomOut() {
+		if (zoomLevel > MIN_ZOOM_LEVEL) {
+			setZoomLevel(zoomLevel / ZOOM_INCREMENT);
+		}
 	}
 	
 	private void addImage(ImageModel imageModel, int index) {
@@ -62,6 +100,11 @@ public class TimelineView {
 		if (img != null) {
 			hbox.getChildren().remove(img.getNode());
 		}
+	}
+	
+	public void clear() {
+		imageNodeMap.clear();
+		hbox.getChildren().clear();
 	}
 
 	public void setZoomLevel(double zoomLevel) {
@@ -95,42 +138,7 @@ public class TimelineView {
 	}
 	
 	public BorderPane getNode() {
-		BorderPane borderPane = new BorderPane(scrollPane);
-		
-		Pane pane1 = new StackPane();
-		Pane inner1 = new StackPane();
-		Button plusButton = new Button("+");
-		plusButton.prefHeightProperty().bind(inner1.heightProperty());
-//		plusButton.prefWidthProperty().bind(inner1.widthProperty());
-		pane1.getChildren().addAll(inner1, plusButton);
-		
-		Pane pane2 = new StackPane();
-		Pane inner2 = new StackPane();
-		Button minusButton = new Button("-");
-		minusButton.prefHeightProperty().bind(inner2.heightProperty());
-		minusButton.prefWidthProperty().bind(inner2.widthProperty());
-		pane2.getChildren().addAll(inner2, minusButton);
-
-		plusButton.setOnAction(event -> zoomIn());
-		minusButton.setOnAction(event -> zoomOut());
-
-		VBox.setVgrow(pane1, Priority.ALWAYS);
-		VBox.setVgrow(pane2, Priority.ALWAYS);
-		
-		borderPane.setRight(new VBox(pane1, pane2));
 		return borderPane;
-	}
-	
-	private void zoomIn() {
-		if (zoomLevel < MAX_ZOOM_LEVEL) {
-			setZoomLevel(zoomLevel * ZOOM_INCREMENT);
-		}
-	}
-	
-	private void zoomOut() {
-		if (zoomLevel > MIN_ZOOM_LEVEL) {
-			setZoomLevel(zoomLevel / ZOOM_INCREMENT);
-		}
 	}
 	
 }

@@ -6,10 +6,11 @@ TODO:
   - Line tool (optional antialiassing)
   - Select and cut/copy/paste/move
 - Make better image duration dialog
-- Save project to open later without exporting
 - Add export timeline button (single or multiple files? Will need different arduino codes to cope)
 - Drag and drop images around the timeline
   - Or at least swap with adjacent images
+- Add text as well as images (Will require additional arduino code)
+- Add loaded project model to home view
 
 
 DONE:
@@ -28,3 +29,8 @@ DONE:
 + Min and max zoom levels
 + Convert LoadedImageView to use a LoadedImageModel
 + Ensured separation of image used in loaded and timeline views
++ Save project to open later without exporting
+  + Make zip file containing:
+    * .csv holding order of loaded files (file name, saved file name)
+    * .csv holding order and duration of images (file name, saved file name, duration)
+    * .bmp files for all loaded and timeline images

@@ -60,31 +60,33 @@ public class LoadedImageNode implements Observable {
 	
 	private MenuItem createSaveItem() {
 		MenuItem saveItem = new MenuItem("Save");
-		saveItem.setOnAction(event -> {
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.getExtensionFilters().add(new ExtensionFilter("Bitmap Files", "*.bmp"));
-
-			if (imageData.getFilePath() != null) {
-				try {
-					fileChooser.setInitialDirectory(new File(imageData.getFilePath().toURI()).getParentFile());
-					fileChooser.setInitialFileName(new File(imageData.getFilePath().toURI()).getName());
-				} catch (Exception exptn) {
-					exptn.printStackTrace();
-				}
-			}
-			
-			File file = fileChooser.showSaveDialog(imageView.getScene().getWindow());
-			if (file != null) {
-				try {
-					ImageIO.write(imageData.getImage(), "bmp", file);
-					imageData.setFilePath(file.toURI().toURL());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		saveItem.setOnAction(event -> save());
 		
 		return saveItem;
+	}
+	
+	private void save() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("Bitmap Files", "*.bmp"));
+
+		if (imageData.getFilePath() != null) {
+			try {
+				fileChooser.setInitialDirectory(new File(imageData.getFilePath().toURI()).getParentFile());
+				fileChooser.setInitialFileName(new File(imageData.getFilePath().toURI()).getName());
+			} catch (Exception exptn) {
+				exptn.printStackTrace();
+			}
+		}
+		
+		File file = fileChooser.showSaveDialog(imageView.getScene().getWindow());
+		if (file != null) {
+			try {
+				ImageIO.write(imageData.getImage(), "bmp", file);
+				imageData.setFilePath(file.toURI().toURL());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	private MenuItem createAddToTimelineItem() {
