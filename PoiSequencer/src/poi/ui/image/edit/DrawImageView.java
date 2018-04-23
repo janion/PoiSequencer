@@ -1,9 +1,14 @@
 package poi.ui.image.edit;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.scene.ImageCursor;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
@@ -73,8 +78,31 @@ public class DrawImageView {
 				pixels.put(new Pair<>(x, y), colouredPane);
 			}
 		}
+
+		drawImageModel.getObserverManager().addObserver(DrawImageModel.DRAW_MODE, this::updateCursor);
+		updateCursor(drawImageModel.getDrawMode());
 		
 		setupUndoRedo();
+	}
+	
+	private void updateCursor(DrawMode drawMode) {
+		switch (drawMode) {
+			case PENCIL:
+				setCursor("pencilCursor2.png", 0, 11);
+				break;
+			case PAINT_POT:
+				setCursor("paintPotCursor2.png", 1, 11);
+				break;
+		}
+	}
+	
+	private void setCursor(String imageFile, int x, int y) {
+		try {
+			Image img = new Image(new FileInputStream(new File(imageFile)));
+			gridPane.setCursor(new ImageCursor(img, x, y));
+		} catch (FileNotFoundException exptn) {
+			exptn.printStackTrace();
+		}
 	}
 	
 	private void setupUndoRedo() {
