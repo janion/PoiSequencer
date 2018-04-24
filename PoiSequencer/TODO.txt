@@ -42,3 +42,4 @@ DONE:
 + Export timeline menu item (single or multiple files? Will need different arduino codes to cope)
 + Model for drawing image
 + Controls for what draw tool is being used
++ Coordinate display for drawing view

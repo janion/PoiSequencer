@@ -13,14 +13,19 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import poi.observable.Observable;
+import poi.observable.ObserverManager;
+import poi.observable.ObserverManagerImpl;
+import poi.observable.ObserverType;
 import poi.ui.image.edit.colour.Colour;
 import poi.ui.image.edit.colour.ColouredPane;
 import poi.utility.Pair;
 
-public class DrawImageView {
+public class DrawImageView implements Observable {
 	
 	private class IndexedPane {
 		
@@ -46,11 +51,17 @@ public class DrawImageView {
 			return y;
 		}
 	}
+
+	public static final ObserverType<Pair<Integer, Integer>> MOUSE_POSITION = new ObserverType<>();
+	public static final ObserverType<Void> MOUSE_LEFT = new ObserverType<>();
 	
+	private BorderPane borderPane;
 	private GridPane gridPane;
 	private DrawImageModel drawImageModel;
 	
 	private Map<Pair<Integer, Integer>, ColouredPane> pixels;
+	
+	private ObserverManager observerManager = new ObserverManagerImpl();
 	
 	public DrawImageView(DrawImageModel drawImageModel) {
 		this.drawImageModel = drawImageModel;
@@ -70,14 +81,26 @@ public class DrawImageView {
 				final int X = x;
 				final int Y = y;
 
+				pane.addEventHandler(MouseEvent.MOUSE_ENTERED,
+						event -> observerManager.notifyObservers(MOUSE_POSITION, new Pair<>(X, Y)));
+				pane.addEventHandler(MouseDragEvent.MOUSE_DRAG_ENTERED,
+						event -> observerManager.notifyObservers(MOUSE_POSITION, new Pair<>(X, Y)));
+				
 				pane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> drawImageModel.setPixelColour(X, Y));
 				pane.addEventHandler(MouseDragEvent.DRAG_DETECTED, event -> startPaint(indexedPane));
 				pane.addEventHandler(MouseDragEvent.MOUSE_DRAG_ENTERED, event -> drawImageModel.setPixelColour(X, Y));
 				pane.addEventHandler(MouseDragEvent.MOUSE_DRAG_RELEASED, event -> drawImageModel.endPaint());
+
+				gridPane.addEventHandler(MouseEvent.MOUSE_EXITED,
+						event -> observerManager.notifyObservers(MOUSE_LEFT, null));
+				gridPane.addEventHandler(MouseDragEvent.MOUSE_DRAG_EXITED,
+						event -> observerManager.notifyObservers(MOUSE_LEFT, null));
 				
 				pixels.put(new Pair<>(x, y), colouredPane);
 			}
 		}
+		
+		borderPane = new BorderPane(gridPane);
 
 		drawImageModel.getObserverManager().addObserver(DrawImageModel.DRAW_MODE, this::updateCursor);
 		updateCursor(drawImageModel.getDrawMode());
@@ -143,8 +166,13 @@ public class DrawImageView {
 		return drawImageModel;
 	}
 	
-	public GridPane getNode() {
-		return gridPane;
+	public BorderPane getNode() {
+		return borderPane;
+	}
+
+	@Override
+	public ObserverManager getObserverManager() {
+		return observerManager;
 	}
 
 }

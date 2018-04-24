@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -54,6 +55,29 @@ public class EditImageView {
 		drawImageView = new DrawImageView(drawImageModel);
 		borderPane.setCenter(new ScrollPane(drawImageView.getNode()));
 		
+		// Don't like this. Would be better in DrawImageView where drag entered an exited events
+		// add and remove pixels
+//		Pane dragPane = new Pane();
+//		dragPane.setMinSize(10, 10);
+//		dragPane.setMaxSize(10, 10);
+//		dragPane.setStyle("-fx-background-color: GREY; -fx-border-width: 1; -fx-border-color: BLACK");
+//		BorderPane bp = new BorderPane(drawImageView.getNode());
+//		bp.setRight(dragPane);
+//		BorderPane.setAlignment(dragPane, Pos.CENTER_LEFT);
+//		borderPane.setCenter(new ScrollPane(bp));
+//		
+//		dragPane.addEventHandler(MouseDragEvent.DRAG_DETECTED, event -> {
+//			Bounds bounds = dragPane.localToScreen(dragPane.getBoundsInLocal());
+//			double x = event.getScreenX();
+//			double y = event.getScreenY();
+//			if (y >= bounds.getMinY() && y < bounds.getMaxY()) {
+//				if (x < bounds.getMinX()) {
+//					System.out.println("Ensmallen");
+//				} else {
+//					System.out.println("Enbiggen");
+//				}
+//			}
+//		});
 
 		Button doneButton = new Button("\u2714");
 		doneButton.setStyle("-fx-text-fill: GREEN; -fx-font-size: 20");
@@ -62,10 +86,21 @@ public class EditImageView {
 
 		doneButton.setOnAction(event -> close(true));
 		cancelButton.setOnAction(event -> close(false));
+
+		Label coordinateLabel = new Label();
+		drawImageView.getObserverManager().addObserver(DrawImageView.MOUSE_POSITION, coordinate -> coordinateLabel
+				.setText(String.format("(%d, %d)", coordinate.getFirst(), coordinate.getSecond())));
+		drawImageView.getObserverManager().addObserver(DrawImageView.MOUSE_LEFT,
+				nullValue -> coordinateLabel.setText(""));
+
+		Pane filler1 = new Pane();
+		HBox.setHgrow(filler1, Priority.ALWAYS);
+		Pane filler2 = new Pane();
+		HBox.setHgrow(filler2, Priority.ALWAYS);
 		
-		Pane filler = new Pane();
-		HBox.setHgrow(filler, Priority.ALWAYS);
-		borderPane.setBottom(new HBox(doneButton, filler, cancelButton));
+		HBox hbox = new HBox(doneButton, filler1, coordinateLabel, filler2, cancelButton);
+		hbox.setAlignment(Pos.CENTER);
+		borderPane.setBottom(hbox);
 	}
 	
 	private Button createPencilButton(ImageView imageView) {
